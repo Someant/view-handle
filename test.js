@@ -1,5 +1,5 @@
 var fs = require("fs");
-//var cheerio=require("cheerio");
+var cheerio=require("cheerio");
 
 // 异步读取
 fs.readFile('test.html', function (err, data) {
@@ -7,13 +7,11 @@ fs.readFile('test.html', function (err, data) {
         return console.error(err);
     }
 
-    var pattern = /\<img.+src\=(?:\"|\')(.+?)(?:\"|\')(?:.+?)\>/,
-        str = data.toString();
-    var img=str.match(pattern);
-    for(var i in img){
-        //console.log(img[i]);
-    }
+    var $=cheerio.load(str);
+    $('img').each(function(){
+        var imgurl=$(this).attr('src');
+        console.log(imgurl);
+    });
 
-    console.log(img[2]);
 
 });
