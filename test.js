@@ -1,5 +1,5 @@
 var fs = require("fs");
-var cheerio=require("cheerio");
+var cheerio = require("cheerio");
 
 // 异步读取
 fs.readFile('shop.html', function (err, data) {
@@ -11,16 +11,27 @@ fs.readFile('shop.html', function (err, data) {
 
     var $=cheerio.load(str);
 
+    var dataArray=[],imgUrl=[],cssUrl=[],jsUrl=[];
+
     //images url
     $('img').each(function(){
-        var imgUrl=$(this).attr('src');
-        console.log(imgUrl);
+        var val=$(this).attr('src');
+        //console.log(imgUrl);
+        if(imgUrl.length==0)
+        {
+            imgUrl[0]=val;
+        }
+        else
+        {
+            imgUrl.push(val);
+        }
+
     });
 
     //css url
     $('link').each(function(){
         var cssUrl=$(this).attr('href');
-        console.log(cssUrl);
+        //console.log(cssUrl);
     });
 
     //script url
@@ -29,9 +40,13 @@ fs.readFile('shop.html', function (err, data) {
 
         if(jsUrl)
         {
-            console.log(jsUrl);
+            //console.log(jsUrl);
         }
 
     });
 
+    console.log(imgUrl);
+
+    fs.writeFileSync('data.json', JSON.stringify(imgUrl), 'utf8');
 });
+
