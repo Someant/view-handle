@@ -1,5 +1,12 @@
 var fs = require("fs");
 var cheerio = require("cheerio");
+var rootPath=process.argv[2];
+
+var config={
+    'domain':'http://shop.esgame.com',
+    'version':'0.1',
+    'localPath':'content'
+}
 
 // 异步读取
 fs.readFile('shop.html', function (err, data) {
@@ -30,23 +37,64 @@ fs.readFile('shop.html', function (err, data) {
 
     //css url
     $('link').each(function(){
-        var cssUrl=$(this).attr('href');
+        var val=$(this).attr('href');
         //console.log(cssUrl);
+        if(cssUrl.length==0)
+        {
+            cssUrl[0]=val;
+        }
+        else
+        {
+            cssUrl.push(val);
+        }
     });
 
     //script url
     $('script').each(function(){
-        var jsUrl=$(this).attr('src');
+        var val=$(this).attr('src');
 
-        if(jsUrl)
+        if(val)
         {
             //console.log(jsUrl);
+            if(jsUrl.length==0)
+            {
+                jsUrl[0]=val;
+            }
+            else
+            {
+                jsUrl.push(val);
+            }
         }
 
     });
 
-    console.log(imgUrl);
+    dataArray= {
+        'images': imgUrl,
+        'css':cssUrl,
+        'script':jsUrl
+    };
 
-    fs.writeFileSync('data.json', JSON.stringify(imgUrl), 'utf8');
+    fs.writeFileSync('data.json', JSON.stringify(dataArray,null, ' '), 'utf8');
+
 });
 
+function completeUrl(path)
+{
+
+
+}
+
+function getAllFiles(root){
+    var res = [] , files = fs.readdirSync(root);
+    files.forEach(function(file){
+        var pathname = root+'/'+file
+            , stat = fs.lstatSync(pathname);
+
+        if (!stat.isDirectory()){
+            res.push(pathname.replace(rootPath,'.'));
+        } else {
+            res = res.concat(getAllFiles(pathname));
+        }
+    });
+    return res
+};
